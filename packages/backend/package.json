@@ -1,5 +1,5 @@
 {
-  "name": "chat-room-bun",
+  "name": "multiplayer-games-be",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
