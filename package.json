@@ -1,0 +1,5 @@
+{
+  "name": "multiplayer-games-monorepo",
+  "private": true,
+  "workspaces": ["packages/*"]
+}
