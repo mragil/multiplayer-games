@@ -35,6 +35,10 @@ class Room {
     return this.game?.getGameName();
   }
 
+  public getSerializableState() {
+    return this.game;
+  }
+
   public isUserInRoom(username: string) {
     const existingUsername = this.member.find(
       (client) => client.data.username === username

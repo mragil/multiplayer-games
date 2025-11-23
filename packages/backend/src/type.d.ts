@@ -5,6 +5,7 @@ interface ClientData {
   username: string;
   room: string;
   genre: Genre;
+  isRoomExist: boolean;
 }
 
 type Pick = "Rock" | "Paper" | "Scissor";

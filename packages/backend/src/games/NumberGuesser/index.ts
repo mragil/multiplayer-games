@@ -24,7 +24,7 @@ class NumberGuesser {
   private timerPlayer?: Timer;
   private replay: string[];
 
-  constructor(room: Room) {
+  constructor(room: Room, targetNumber: number = 0, counter: number = 15,  ) {
     this.name = "NUMBER_GUESSER";
     this.room = room;
     this.targetNumber = 0;
