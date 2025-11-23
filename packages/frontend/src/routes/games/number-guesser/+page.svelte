@@ -87,7 +87,7 @@
 				{/if}
 			</div>
 			<div slot="button-action-footer">
-				{#if modalInfo === ''}
+				{#if modalInfo === '' && isFinish}
 					<button class="mx-auto my-auto w-20 text-black"
 						><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
 							><path
@@ -126,7 +126,8 @@
 				<h1 class={opponent ? '' : 'animate-bounce'}>{opponentText}</h1>
 				<h2>Score: {scores[opponent] || 0}</h2>
 				<Deck {sendGuess} {minRange} {maxRange} />
-				<h1>{userGuessed ? `You Guess ${userGuessed}` : 'Your Turn'}</h1>
+				<h1>{timer ? `Your Turn` : ''}</h1>
+				<h1>{userGuessed ? `You Guess ${userGuessed}` : ''}</h1>
 				<h2>Score: {scores[name] || 0}</h2>
 			</div>
 		</div>

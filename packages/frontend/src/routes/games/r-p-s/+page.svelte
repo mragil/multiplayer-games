@@ -23,6 +23,7 @@
 	import { slide } from 'svelte/transition';
 
 	import Modal from '$lib/components/Modal.svelte';
+	import { RPS_CHOICES } from '$lib/constants';
 	import Deck from './Deck.svelte';
 	import Intro from './Intro.svelte';
 
@@ -66,18 +67,27 @@
     <title>Rock Paper Scissor</title> 
 </svelte:head>
 
-<div class="text-center py-10 mx-auto my-auto">
+<div class="text-center py-10 flex justify-center items-center">
 	{#if isConnected}
 		<Modal bind:isOpen={isFinish} closeHandler={resetGame}>
 			<h1 slot="header" class="text-4xl">{showWinner(winner)}</h1>
 			<div class="my-5" slot="content">
 				{#if gameData}
-					<p>You pick: {gameData[$user.name] || 'Nothing 😢'}</p>
-					<p>{opponent} pick: {gameData[opponent] || 'Nothing 😢'}</p>
+					<p class="mt-7">You pick: 
+						<span>
+							<img src={RPS_CHOICES[gameData[$user.name]]} class="w-22 mx-auto" alt="Your choice"/>
+						</span>
+					</p>
+					<p class="mt-7 mb-7">{opponent} pick: 
+						<span>
+							<img src={RPS_CHOICES[gameData[opponent]]} class="w-22 mx-auto" alt="Opponent choice"/>
+						</span>
+					</p>
 				{/if}
 			</div>
 			<div slot="button-action-footer">
 				{#if info === ''}
+					<!-- svelte-ignore a11y_consider_explicit_label -->
 					<button class="mx-auto my-auto w-20 text-black"
 						><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
 							><path

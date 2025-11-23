@@ -14,7 +14,7 @@
 	bind:this={dialog}
 	on:close={() => (isOpen = false)}
 	on:click|self={() => dialog.close()}
-	class="rounded-lg backdrop:bg-black backdrop:opacity-50"
+	class="rounded-lg backdrop:bg-black backdrop:opacity-50 my-auto mx-auto"
 >
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
