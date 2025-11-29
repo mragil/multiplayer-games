@@ -1,4 +1,18 @@
 services:
+  redis:
+    image: redis:8-alpine
+    ports: []
+    command: redis-server 
+      --maxmemory 256mb 
+      --maxmemory-policy allkeys-lrueviction
+      --appendonly yes  # RDB + AOF durability
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   backend:
     build: ./packages/backend
     env_file:
@@ -14,17 +28,3 @@ services:
       - ./packages/frontend/.env
     depends_on:
       - backend
-
-  redis:
-    image: redis:8-alpine
-    ports: []
-    command: redis-server 
-      --maxmemory 256mb 
-      --maxmemory-policy allkeys-lrueviction
-      --appendonly yes  # RDB + AOF durability
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
