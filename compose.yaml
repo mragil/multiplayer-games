@@ -16,4 +16,15 @@ services:
       - backend
 
   redis:
-    image: redis:7-alpine
+    image: redis:8-alpine
+    ports: []
+    command: redis-server 
+      --maxmemory 256mb 
+      --maxmemory-policy allkeys-lrueviction
+      --appendonly yes  # RDB + AOF durability
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
