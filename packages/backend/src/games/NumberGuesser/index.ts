@@ -102,11 +102,9 @@ class NumberGuesser {
       text: `${this.currentPlayer.data.username}}`,
     };
     this.room.broadcastMessage(msg);
-    console.log('inform player ya')
 
     //TIMER
     if (!this.timerPlayer) {
-      console.log('start timer')
       this.timerPlayer = setInterval(() => {
         if (this.counter === 0) {
           this.room.broadcastMessage({
@@ -127,7 +125,6 @@ class NumberGuesser {
           });
           this.resetTimer();
         } else {
-          console.log('timer', this.counter);
           this.room.sendMessage(this.currentPlayer, {
             type: "TIMER",
             text: `${this.counter}`,
@@ -139,7 +136,6 @@ class NumberGuesser {
   }
 
   private informGameStart() {
-    console.log('start')
     this.targetNumber = Math.floor(Math.random() * TARGET_LIMIT) + 1;
     this.game.targetNumber = this.targetNumber;
     this.minLimit = 1;
@@ -164,7 +160,6 @@ class NumberGuesser {
   }
 
   public continueGame() {
-    console.log('continue',this.game.targetNumber)
     const members = this.room.getMember();
     members.forEach((member, idx) => {
       this.room.sendMessage(member, {
@@ -243,7 +238,6 @@ class NumberGuesser {
   }
 
   public handleReplay(ws: ServerWebSocket<ClientData>) {
-    console.log('member count game', this.room.getMember().length)
     if (this.room.getMember().length !== 2) {
       return;
     }
@@ -280,7 +274,6 @@ class NumberGuesser {
   public preparePlayerReconnect(ws: ServerWebSocket<ClientData>) {
     clearInterval(this.timerPlayer);
     this.timerPlayer = undefined;
-    console.log('Prepare Reconnected Player: ', ws.data.username);
   }
 }
 

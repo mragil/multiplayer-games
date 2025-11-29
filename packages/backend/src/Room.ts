@@ -60,13 +60,10 @@ class Room {
       'EX',
       900
     );
-    console.log('member count', this.member.length)
     if (this.member.length === LIMIT) {
       if(this.game) {
-        console.log('ada')
         this.game.continueGame();
       } else {
-        console.log('baru', {genre: this.genre})
         this.game =
           this.genre === "NUMBER_GUESSER"
             ? new NumberGuesser(this)

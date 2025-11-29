@@ -163,9 +163,7 @@ class RockPaperScissor {
     this.resetTimer();
   }
 
-  public preparePlayerReconnect(ws: ServerWebSocket<ClientData>) {
-    console.log('Prepare Reconnected Player: ', ws.data.username);
-  }
+  public preparePlayerReconnect(ws: ServerWebSocket<ClientData>) {}
 }
 
 export default RockPaperScissor;

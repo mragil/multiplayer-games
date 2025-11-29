@@ -136,15 +136,16 @@
 
 			<div class="grid grid-rows-2 gap-8 place-content-center" transition:slide={{}}>
 				<h1 class={opponent ? '' : 'animate-bounce'}>{opponentText}</h1>
-				<h2>Score: {scores[opponent] || 0}</h2>
-				{console.log('timernya', timer)}
+				{#if opponent}
+					<h2>{opponent} Score: {scores[opponent] || 0}</h2>
+				{/if}
 				{#if timer && timer !== 'X'}
 					<Deck {sendGuess} {minRange} {maxRange} />
-				{:else}
+				{:else if opponent}
 					<h1 class='animate-bounce'>Waiting for {opponent} to guess...</h1>
 				{/if}
 				<h1>{userGuessed ? `You Guess ${userGuessed}` : ''}</h1>
-				<h2>Score: {scores[name] || 0}</h2>
+				<h2>Your Score: {scores[name] || 0}</h2>
 				<Logout {socket}/>
 			</div>
 		</div>
