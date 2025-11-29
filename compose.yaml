@@ -1,11 +1,10 @@
 services:
   redis:
     image: redis:8-alpine
-    ports: []
-    command: redis-server 
-      --maxmemory 256mb 
+    command: redis-server
+      --maxmemory 256mb
       --maxmemory-policy allkeys-lrueviction
-      --appendonly yes  # RDB + AOF durability
+      --appendonly yes # RDB + AOF durability
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
