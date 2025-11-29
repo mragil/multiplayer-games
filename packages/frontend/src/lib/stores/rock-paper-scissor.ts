@@ -17,7 +17,8 @@ interface Message {
 		| 'RESET'
 		| 'REPLAY'
 		| 'OPPONENT-LEFT'
-		| 'PLAYER_TURN';
+		| 'PLAYER_TURN'
+		| 'CURRENT_SCORE';
 	text: string;
 	data?: Result;
 }
@@ -86,6 +87,10 @@ const store = () => {
 						gameData: message.data!.game,
 						scores: message.data!.score
 					}));
+				}
+
+				if (message.type === 'CURRENT_SCORE') {
+					update((state) => ({ ...state, scores: message.data!.score }));
 				}
 				if (message.type === 'INFO') {
 					update((state) => ({ ...state, info: message.text }));

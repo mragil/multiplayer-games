@@ -5,6 +5,7 @@ interface ClientData {
   username: string;
   room: string;
   genre: Genre;
+  isRoomExist: boolean;
 }
 
 type Pick = "Rock" | "Paper" | "Scissor";
@@ -47,13 +48,13 @@ type Message = {
     | "TIMER"
     | "RESET"
     | "REPLAY"
-    | "OPPONENT-LEFT";
+    | "OPPONENT-LEFT"
   text: string | Buffer;
 }
 
 type ResultMessage = {
-  type: "RESULT";
-  text: string | Buffer;
+  type: | "RESULT" | "CURRENT_SCORE";
+  text?: string | Buffer;
   data: Result;
 }
 

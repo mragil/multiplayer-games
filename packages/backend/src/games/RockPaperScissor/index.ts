@@ -33,6 +33,10 @@ class RockPaperScissor {
     return "ROCK_PAPER_SCISSOR";
   }
 
+  public getGameScore() {
+    return this.scores;
+  }
+
   private resetTimer() {
     clearInterval(this.timer);
     this.counter = 15;
@@ -53,6 +57,22 @@ class RockPaperScissor {
         type: "OPPONENT",
         text: `${members[(idx + 1) % members.length].data.username}`,
       });
+    });
+  }
+
+  public continueGame() {
+    const members = this.room.getMember();
+    members.forEach((member, idx) => {
+      this.room.sendMessage(member, {
+        type: "OPPONENT",
+        text: `${members[(idx + 1) % members.length].data.username}`,
+      });
+    });
+    this.room.broadcastMessage({
+      type: 'CURRENT_SCORE',
+      data: {
+        score: this.scores
+      }
     });
   }
 
@@ -141,6 +161,10 @@ class RockPaperScissor {
     delete this.game[username];
     this.scores[Object.keys(this.scores)[0]] = 0;
     this.resetTimer();
+  }
+
+  public preparePlayerReconnect(ws: ServerWebSocket<ClientData>) {
+    console.log('Prepare Reconnected Player: ', ws.data.username);
   }
 }
 

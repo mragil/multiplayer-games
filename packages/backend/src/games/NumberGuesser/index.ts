@@ -24,11 +24,11 @@ class NumberGuesser {
   private timerPlayer?: Timer;
   private replay: string[];
 
-  constructor(room: Room) {
+  constructor(room: Room, targetNumber: number = 0, counter: number = 15,  ) {
     this.name = "NUMBER_GUESSER";
     this.room = room;
     this.targetNumber = 0;
-    this.counter = 15;
+    this.counter = 20;
     this.game = {
       targetNumber: 0,
       player: this.room.getMember().reduce(
@@ -102,9 +102,11 @@ class NumberGuesser {
       text: `${this.currentPlayer.data.username}}`,
     };
     this.room.broadcastMessage(msg);
+    console.log('inform player ya')
 
     //TIMER
     if (!this.timerPlayer) {
+      console.log('start timer')
       this.timerPlayer = setInterval(() => {
         if (this.counter === 0) {
           this.room.broadcastMessage({
@@ -125,6 +127,7 @@ class NumberGuesser {
           });
           this.resetTimer();
         } else {
+          console.log('timer', this.counter);
           this.room.sendMessage(this.currentPlayer, {
             type: "TIMER",
             text: `${this.counter}`,
@@ -136,6 +139,7 @@ class NumberGuesser {
   }
 
   private informGameStart() {
+    console.log('start')
     this.targetNumber = Math.floor(Math.random() * TARGET_LIMIT) + 1;
     this.game.targetNumber = this.targetNumber;
     this.minLimit = 1;
@@ -156,6 +160,37 @@ class NumberGuesser {
     });
 
     //Inform Player 1 turn
+    this.informPlayerTurn();
+  }
+
+  public continueGame() {
+    console.log('continue',this.game.targetNumber)
+    const members = this.room.getMember();
+    members.forEach((member, idx) => {
+      this.room.sendMessage(member, {
+        type: "OPPONENT",
+        text: `${members[(idx + 1) % members.length].data.username}`,
+      });
+    });
+
+    // Inform target number range to all player
+    this.room.broadcastMessage({
+      type: "GAME",
+      text: `${this.minLimit}-${this.maxLimit}`,
+    });
+
+    this.room.broadcastMessage({
+      type: 'CURRENT_SCORE',
+      data: {
+        score: this.scores
+      }
+    });
+
+    const userWithNewConn = this.room
+      .getMember()
+      .find((player) => player.data.username === this.currentPlayer.data.username)!;
+    this.currentPlayer = userWithNewConn;
+
     this.informPlayerTurn();
   }
 
@@ -208,6 +243,7 @@ class NumberGuesser {
   }
 
   public handleReplay(ws: ServerWebSocket<ClientData>) {
+    console.log('member count game', this.room.getMember().length)
     if (this.room.getMember().length !== 2) {
       return;
     }
@@ -239,6 +275,12 @@ class NumberGuesser {
     this.scores[Object.keys(this.scores)[0]] = 0;
     this.game.player[Object.keys(this.game.player)[0]] = [];
     this.resetTimer();
+  }
+
+  public preparePlayerReconnect(ws: ServerWebSocket<ClientData>) {
+    clearInterval(this.timerPlayer);
+    this.timerPlayer = undefined;
+    console.log('Prepare Reconnected Player: ', ws.data.username);
   }
 }
 

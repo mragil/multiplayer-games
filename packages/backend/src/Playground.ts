@@ -2,12 +2,15 @@ import { ClientData, Genre, Rooms, ServerWebSocket } from "./type";
 
 import Room from "./Room";
 import { LIMIT } from "./constant";
+import { RedisClient } from "bun";
 
 class Playground {
   private rooms: Rooms;
+  private redis: RedisClient;
 
-  public constructor() {
+  public constructor(redis: RedisClient) {
     this.rooms = {};
+    this.redis = redis;
   }
 
   public initializeRoom(
@@ -15,7 +18,7 @@ class Playground {
     ws: ServerWebSocket<ClientData>,
     genre: Genre
   ) {
-    this.rooms[room] = new Room(ws, genre);
+    this.rooms[room] = new Room(this.redis, ws, genre);
   }
 
   public isRoomExist(room: string) {

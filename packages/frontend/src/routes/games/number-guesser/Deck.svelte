@@ -23,7 +23,8 @@
 	class="flex flex-col gap-5 items-center"
 >
 	<input
-		class="w-24 aspect-square rounded-md text-center"
+		autofocus
+		class="w-24 aspect-square rounded-md text-center border-2"
 		type="number"
 		name="number-guessed"
 		bind:value={numberGuessed}

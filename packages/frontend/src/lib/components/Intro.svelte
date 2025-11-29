@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { user } from '$lib/stores/user';
 
-	export let connectToRoom: () => void;
+	export let connectToRoom: (name: string, room: string) => void;
 </script>
 
 <div class="">
 	<form
 		action=""
 		class="grid gap-5 grid-rows-3 items-center mb-0 mt-6 p-4 sm:p-6 lg:p-8"
-		on:submit={connectToRoom}
+		on:submit={() => {
+			localStorage.setItem(`multiplayer-games-data`, JSON.stringify($user))
+			connectToRoom($user.name, $user.room);
+		}}
 	>
 		<p class="text-center text-7xl font-medium mb-10 text-orange-600">Welcome</p>
 

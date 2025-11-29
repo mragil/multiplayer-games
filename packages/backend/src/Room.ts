@@ -1,3 +1,6 @@
+import { RedisClient } from "bun";
+
+import { LIMIT } from "./constant";
 import NumberGuesser from "./games/NumberGuesser";
 import RockPaperScissor from "./games/RockPaperScissor";
 import {
@@ -12,9 +15,12 @@ class Room {
   private member: ServerWebSocket<ClientData>[];
   private game?: NumberGuesser | RockPaperScissor;
   private genre: Genre;
+  private redis: RedisClient;
 
-  constructor(ws: ServerWebSocket<ClientData>, genre: Genre) {
-    this.member = [ws];
+  constructor(redis: RedisClient, ws: ServerWebSocket<ClientData>, genre: Genre) {
+    this.redis = redis;
+    this.member = [];
+    this.addMember(ws);
     this.game = undefined;
     this.genre = genre;
   }
@@ -35,6 +41,10 @@ class Room {
     return this.game?.getGameName();
   }
 
+  public getSerializableState() {
+    return this.game;
+  }
+
   public isUserInRoom(username: string) {
     const existingUsername = this.member.find(
       (client) => client.data.username === username
@@ -42,13 +52,26 @@ class Room {
     return !!existingUsername;
   }
 
-  public addMember(ws: ServerWebSocket<ClientData>) {
+  public async addMember(ws: ServerWebSocket<ClientData>) {
     this.member.push(ws);
-    if (this.member.length === 2) {
-      this.game =
-        this.genre === "NUMBER_GUESSER"
-          ? new NumberGuesser(this)
-          : new RockPaperScissor(this);
+    await this.redis.set(
+      `${ws.data.room}-members`,
+      JSON.stringify(this.member.map(client => client.data.username)),
+      'EX',
+      900
+    );
+    console.log('member count', this.member.length)
+    if (this.member.length === LIMIT) {
+      if(this.game) {
+        console.log('ada')
+        this.game.continueGame();
+      } else {
+        console.log('baru', {genre: this.genre})
+        this.game =
+          this.genre === "NUMBER_GUESSER"
+            ? new NumberGuesser(this)
+            : new RockPaperScissor(this);
+      }
     }
   }
 
@@ -70,13 +93,32 @@ class Room {
     this.game?.handleReplay(ws);
   }
 
-  public handleLeave(ws: ServerWebSocket<ClientData>) {
+  public async handleLeave(ws: ServerWebSocket<ClientData>, disableReconnect: boolean = false) {
     const { username } = ws.data;
     this.member = this.member.filter((client) => client != ws);
 
     if (this.member.length === 0) {
+      await this.redis.del(`${ws.data.room}-members`);
       return;
     }
+
+    const rawCachedMembers = await this.redis.get(`${ws.data.room}-members`);
+    if(rawCachedMembers && !disableReconnect) {
+      const parsedMembers = JSON.parse(rawCachedMembers) as string[];
+      const isUserInRoom = parsedMembers.find(member => member === username);
+      if (isUserInRoom) {
+        // Handle game reconnection logic
+        this.game?.preparePlayerReconnect(ws);
+        return;
+      };
+    }
+
+    await this.redis.set(
+      `${ws.data.room}-members`,
+      JSON.stringify(this.member.map(client => client.data.username)),
+      'EX',
+      900
+    );
 
     const msg: Message = {
       type: "OPPONENT-LEFT",
