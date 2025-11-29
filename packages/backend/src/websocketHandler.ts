@@ -5,7 +5,7 @@ import Playground from "./Playground";
 const websocketHandler = (playground: Playground) =>  ({
   open: (ws: Bun.ServerWebSocket<ClientData>) => {
       const { room, username, genre, isRoomExist } = ws.data;
-      console.log("OPEN", { room, username });
+      console.log("OPEN", { room, username, genre });
 
       if (!isRoomExist) {
         playground.initializeRoom(room, ws, genre);
@@ -39,16 +39,17 @@ const websocketHandler = (playground: Playground) =>  ({
       }
     }
   },
-  close: (ws: Bun.ServerWebSocket<ClientData>) => {
+  close: (ws: Bun.ServerWebSocket<ClientData>, code: number) => {
     const { room, username } = ws.data;
     console.log("CLOSE", { room, username });
 
     const existingRoom = playground.getRoom(room);
-    existingRoom.handleLeave(ws);
+    existingRoom.handleLeave(ws, code === 1000);
 
     if (existingRoom.getMemberCount() === 0) {
       playground.deleteRoom(room);
     }
+    console.log('rooms after delete', playground.getRooms());
   },
 });
 

@@ -17,15 +17,17 @@
 		[key: string]: number;
 	}
 
-	import { PUBLIC_WS_HOST } from '$env/static/public';
+	import { onMount } from 'svelte';
 	import { slide } from 'svelte/transition';
 
+	import { PUBLIC_WS_HOST } from '$env/static/public';
+	import Intro from '$lib/components/Intro.svelte';
 	import Modal from '$lib/components/Modal.svelte';
-	import Deck from './Deck.svelte';
-	import Intro from './Intro.svelte';
-
 	import game from '$lib/stores/number-guesser';
 	import { user } from '$lib/stores/user';
+
+	import Logout from '$lib/components/Logout.svelte';
+	import Deck from './Deck.svelte';
 
 	let socket: WebSocket;
 	$: ({ name, room } = $user);
@@ -46,7 +48,7 @@
 	$: opponentText =
 		opponent === '' ? 'Waiting for your opponent...' : `Your opponent is ${opponent}`;
 
-	const connectToRoom = () => {
+	const connectToRoom = (name: string, room: string) => {
 		const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 		socket = new WebSocket(
 			`${protocol}://${PUBLIC_WS_HOST}/number-guesser?userName=${name}&roomName=${room}`
@@ -69,6 +71,16 @@
 	const resetGame = () => {
 		game.resetGame(socket);
 	};
+
+	const storedData = localStorage.getItem('multiplayer-games-data');
+
+	onMount(() => {
+		if(storedData) {
+			const existingUser = JSON.parse(storedData);
+			user.set(existingUser);
+			connectToRoom(existingUser.name, existingUser.room);
+		}
+	});
 </script>
 
 <svelte:head>
@@ -125,10 +137,15 @@
 			<div class="grid grid-rows-2 gap-8 place-content-center" transition:slide={{}}>
 				<h1 class={opponent ? '' : 'animate-bounce'}>{opponentText}</h1>
 				<h2>Score: {scores[opponent] || 0}</h2>
-				<Deck {sendGuess} {minRange} {maxRange} />
-				<h1>{timer ? `Your Turn` : ''}</h1>
+				{console.log('timernya', timer)}
+				{#if timer && timer !== 'X'}
+					<Deck {sendGuess} {minRange} {maxRange} />
+				{:else}
+					<h1 class='animate-bounce'>Waiting for {opponent} to guess...</h1>
+				{/if}
 				<h1>{userGuessed ? `You Guess ${userGuessed}` : ''}</h1>
 				<h2>Score: {scores[name] || 0}</h2>
+				<Logout {socket}/>
 			</div>
 		</div>
 	{:else}

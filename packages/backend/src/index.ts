@@ -1,11 +1,12 @@
-import { ClientData } from "./type";
+import { redis } from "bun";
 
+import type { ClientData } from "./type";
 import websocketHandler from "./websocketHandler";
 import fetchHandler from "./fetchHandler";
 import Playground from "./Playground";
-import { GAME_GENRE, LIMIT, PORT } from "./constant";
+import { PORT } from "./constant";
 
-const PlaygroundNG = new Playground();
+const PlaygroundNG = new Playground(redis);
 
 const server = Bun.serve<ClientData>({
   fetch: fetchHandler(PlaygroundNG),

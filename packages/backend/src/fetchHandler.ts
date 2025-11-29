@@ -16,7 +16,9 @@ const fetchHandler = (playground: Playground) => (req: Request, server: Bun.Serv
     url.pathname === "/number-guesser" ||
     url.pathname === "/rock-paper-scissor"
   ) {
+    console.log('url: ',url.pathname);
     const genre = GAME_GENRE[url.pathname];
+    console.log('genre', genre);
     const username = _getDataFromQuery(req, "userName");
     const room = _getDataFromQuery(req, "roomName");
 

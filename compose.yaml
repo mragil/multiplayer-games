@@ -1,6 +1,10 @@
 services:
   backend:
     build: ./packages/backend
+    env_file:
+      - ./packages/backend/.env
+    depends_on:
+      - redis
 
   frontend:
     build: ./packages/frontend
@@ -10,3 +14,6 @@ services:
       - ./packages/frontend/.env
     depends_on:
       - backend
+
+  redis:
+    image: redis:7-alpine

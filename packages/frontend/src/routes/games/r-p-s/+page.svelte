@@ -19,16 +19,19 @@
 		[key: string]: number;
 	}
 
-	import { PUBLIC_WS_HOST } from '$env/static/public';
-	import { slide } from 'svelte/transition';
 
+	import { slide } from 'svelte/transition';
+	import { onMount } from 'svelte';
+
+	import { PUBLIC_WS_HOST } from '$env/static/public';
 	import Modal from '$lib/components/Modal.svelte';
 	import { RPS_CHOICES } from '$lib/constants';
-	import Deck from './Deck.svelte';
-	import Intro from './Intro.svelte';
-
+	import Intro from '$lib/components/Intro.svelte';
 	import game from '$lib/stores/rock-paper-scissor';
 	import { user } from '$lib/stores/user';
+
+	import Deck from './Deck.svelte';
+	import Logout from '$lib/components/Logout.svelte';
 
 	let socket: WebSocket;
 	$: ({ name, room } = $user);
@@ -36,7 +39,7 @@
 	$: opponentText =
 		opponent === '' ? 'Waiting for your opponent...' : `Your opponent is ${opponent}`;
 
-	const connectToRoom = () => {
+	const connectToRoom = (name: string, room: string) => {
 		const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 		socket = new WebSocket(
 			`${protocol}://${PUBLIC_WS_HOST}/rock-paper-scissor?userName=${name}&roomName=${room}`
@@ -61,6 +64,16 @@
 	const resetGame = () => {
 		game.resetGame(socket);
 	};
+
+	const storedData = localStorage.getItem('multiplayer-games-data');
+
+	onMount(() => {
+		if(storedData) {
+			const existingUser = JSON.parse(storedData);
+			user.set(existingUser);
+			connectToRoom(existingUser.name, existingUser.room);
+		}
+	});
 </script>
 
 <svelte:head>
@@ -114,6 +127,7 @@
 				<Deck {sendPick} active={userPick} />
 				<h1>{userPick ? `You Choose ${userPick}` : 'Your Turn'}</h1>
 				<h2>Score: {scores[name] || 0}</h2>
+				<Logout {socket}/>
 			</div>
 		</div>
 	{:else}
