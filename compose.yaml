@@ -1,7 +1,6 @@
 services:
   redis:
     image: redis:8-alpine
-    ports: []
     command: redis-server 
       --maxmemory 256mb 
       --maxmemory-policy allkeys-lrueviction
